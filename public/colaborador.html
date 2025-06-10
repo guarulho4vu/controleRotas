@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#4CAF50">
+    <meta name="description" content="Sistema de Rotas - Área do Colaborador">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="images/icon-192x192.png">
+    <link rel="apple-touch-icon" href="images/icon-192x192.png">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Área do Colaborador</title>
+</head>
+<body class="colaborador">
+    <header>
+        <div class="header-content">
+            <h1><i class="fas fa-user"></i> Área do Colaborador</h1>
+            <nav>
+                <!-- Botão removido conforme solicitado -->
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="dashboard">
+            <div class="stats-container">
+                <div class="stat-card">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <h3>Total de Rotas</h3>
+                    <p id="totalRoutes">0</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-check-circle"></i>
+                    <h3>Executadas</h3>
+                    <p id="executedRoutes">0</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-clock"></i>
+                    <h3>Pendentes</h3>
+                    <p id="pendingRoutes">0</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="actions-section">
+            <div class="action-card">
+                <h2><i class="fas fa-user-circle"></i> Identificação</h2>
+                <form id="employeeForm" onsubmit="loadMyRoutes(); return false;">
+                    <div class="form-group">
+                        <label for="employeeName">Seu Nome:</label>
+                        <input type="text" id="employeeName" required placeholder="Digite seu nome completo">
+                    </div>
+                    <button type="submit" class="action-button">
+                        <i class="fas fa-sign-in-alt"></i> Entrar
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <section class="routes-section">
+            <div class="section-header">
+                <h2><i class="fas fa-list"></i> Minhas Rotas</h2>
+                <div class="filters">
+                    <select id="statusFilter" onchange="filterRoutes()">
+                        <option value="all">Todos os Status</option>
+                        <option value="pendente">Pendentes</option>
+                        <option value="executado">Executadas</option>
+                    </select>
+                    <div class="search-container">
+                        <input type="text" id="searchInput" placeholder="Pesquisar por endereço...">
+                        <i class="fas fa-search"></i>
+                    </div>
+                </div>
+                <button onclick="generateMyWhatsAppReport()" class="action-button" style="margin-top:10px;">
+                    <i class="fab fa-whatsapp"></i> Enviar Relatório por WhatsApp
+                </button>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Endereço</th>
+                            <th>Número</th>
+                            <th>Complemento</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="routesTableBody">
+                        <!-- As rotas serão inseridas aqui via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script src="colaborador.js"></script>
+</body>
+</html> 

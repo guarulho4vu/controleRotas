@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#2196f3">
+    <meta name="description" content="Sistema de controle e gerenciamento de rotas">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="images/icon-192x192.png">
+    <link rel="apple-touch-icon" href="images/icon-192x192.png">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Controlador de Rotas</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body class="controlador">
+    <header>
+        <div class="header-content">
+            <h1><i class="fas fa-route"></i> Controlador de Rotas</h1>
+            <nav>
+                <a href="colaborador.html" class="nav-link">
+                    <i class="fas fa-users"></i> Área do Colaborador
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="dashboard">
+            <div class="stats-container">
+                <div class="stat-card">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <h3>Total de Rotas</h3>
+                    <p id="totalRoutes">0</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-check-circle"></i>
+                    <h3>Executadas</h3>
+                    <p id="executedRoutes">0</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-clock"></i>
+                    <h3>Pendentes</h3>
+                    <p id="pendingRoutes">0</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="actions-section">
+            <div class="action-card">
+                <h2><i class="fas fa-plus-circle"></i> Nova Rota</h2>
+                <form id="routeForm">
+                    <div class="form-group">
+                        <label for="employee">Colaborador (Nome da Pessoa):</label>
+                        <input type="text" id="employee" required placeholder="Nome do colaborador (ex: João Silva)">
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Endereço:</label>
+                        <input type="text" id="address" required placeholder="Rua, Avenida, etc.">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="number">Número:</label>
+                            <input type="text" id="number" required placeholder="Número do local">
+                        </div>
+                        <div class="form-group">
+                            <label for="complement">Complemento:</label>
+                            <input type="text" id="complement" placeholder="Apto, Casa, Bloco, etc.">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="bairro">Bairro:</label>
+                        <input type="text" id="bairro" placeholder="Bairro">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="cidade">Cidade:</label>
+                            <input type="text" id="cidade" placeholder="Cidade">
+                        </div>
+                        <div class="form-group">
+                            <label for="estado">Estado:</label>
+                            <input type="text" id="estado" placeholder="Estado (ex: SP)">
+                        </div>
+                        <div class="form-group">
+                            <label for="cep">CEP:</label>
+                            <input type="text" id="cep" placeholder="00000-000">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="observacao">Observação:</label>
+                        <textarea id="observacao" placeholder="Informações adicionais para a rota"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="dataEntrega">Data de Entrega Prevista:</label>
+                            <input type="date" id="dataEntrega">
+                        </div>
+                        <div class="form-group">
+                            <label for="prioridade">Prioridade:</label>
+                            <select id="prioridade">
+                                <option value="normal">Normal</option>
+                                <option value="alta">Alta</option>
+                                <option value="baixa">Baixa</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="submissionId">JotForm Submission ID (opcional):</label>
+                        <input type="text" id="submissionId" placeholder="ID da submissão do JotForm (se houver)">
+                    </div>
+                    <button type="submit" class="action-button">
+                        <i class="fas fa-plus"></i> Adicionar Rota
+                    </button>
+                </form>
+            </div>
+
+            <div class="action-card">
+                <h2><i class="fas fa-file-excel"></i> Importar Rotas</h2>
+                <form id="importForm"> <div class="form-group">
+                        <label for="excelFile">Arquivo Excel:</label>
+                        <input type="file" id="excelFile" accept=".xlsx, .xls" required>
+                    </div>
+                    <button type="submit" id="importExcelButton" class="action-button">
+                        <i class="fas fa-upload"></i> Importar
+                    </button>
+                </form>
+            </div>
+
+            <div class="action-card">
+                <h2><i class="fas fa-trash"></i> Limpar Rotas</h2>
+                <button id="clearAllRoutesButton" class="action-button danger">
+                    <i class="fas fa-trash"></i> Limpar Todas as Rotas
+                </button>
+                <div class="form-group" style="margin-top: 15px;">
+                    <label for="clearEmployeeName">Limpar Rotas por Colaborador:</label>
+                    <input type="text" id="clearEmployeeName" placeholder="Nome do colaborador">
+                    <button id="clearRoutesByEmployeeButton" class="action-button danger" style="margin-top: 5px;">
+                        <i class="fas fa-user-times"></i> Limpar por Colaborador
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section class="routes-section">
+            <div class="section-header">
+                <h2><i class="fas fa-list"></i> Lista de Rotas</h2>
+                <div class="filters">
+                    <select id="employeeFilter">
+                        <option value="all">Todos os Colaboradores</option>
+                        </select>
+                    <select id="statusFilter">
+                        <option value="all">Todos os Status</option>
+                        <option value="pendente" selected>Pendentes</option> <option value="executado">Executadas</option>
+                    </select>
+                    <div class="search-container">
+                        <input type="text" id="searchInput" placeholder="Pesquisar rotas...">
+                        <i class="fas fa-search"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tabs-container">
+                <button class="tab-button active" id="pendingTab" onclick="showTab('pending')" data-tab="pending">Rotas Pendentes</button>
+                <button class="tab-button" id="executedTab" onclick="showTab('executed')" data-tab="executed">Rotas Executadas</button>
+            </div>
+
+            <div id="pendingTabContent" class="tab-content active">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Colaborador</th>
+                                <th>Endereço</th>
+                                <th>Número</th>
+                                <th>Complemento</th>
+                                <th>Status</th>
+                                <th>Origem</th>
+                                <th>Ações</th>
+                                <th>Excluir</th>
+                            </tr>
+                        </thead>
+                        <tbody id="routesTableBody">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="executedTabContent" class="tab-content">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Colaborador</th>
+                                <th>Endereço</th>
+                                <th>Número</th>
+                                <th>Complemento</th>
+                                <th>Status</th>
+                                <th>Origem</th>
+                                <th>Data Execução</th>
+                            </tr>
+                        </thead>
+                        <tbody id="executedRoutesTableBody">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="report-section">
+                <h3><i class="fas fa-chart-bar"></i> Relatórios e Exportação</h3>
+                <div class="report-filters">
+                    <select id="reportEmployeeFilter">
+                        <option value="">Selecione um Colaborador</option>
+                        </select>
+                    <input type="date" id="reportDate" value="">
+                    <button id="generateWhatsAppReportButton" onclick="generateWhatsAppReport()" class="action-button whatsapp-button">
+                        <i class="fab fa-whatsapp"></i> Enviar Relatório por WhatsApp
+                    </button>
+                    <button id="exportExcelButton" class="action-button excel-button">
+                        <i class="fas fa-file-excel"></i> Exportar para Excel
+                    </button>
+                    <button id="printRoutesButton" class="action-button print-button">
+                        <i class="fas fa-print"></i> Imprimir Rotas
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="controlador.js"></script>
+    <script>
+        // Registra o Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registrado com sucesso');
+                    })
+                    .catch(error => {
+                        console.log('ServiceWorker falhou ao registrar:', error);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>
