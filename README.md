@@ -29,11 +29,11 @@ Um sistema de gerenciamento de rotas e colaboradores com suporte a PWA (Progress
 ## Como Usar
 
 1. Clone o repositório
-2. Abra o arquivo `controlador.html` em um navegador moderno
-3. Para instalar como PWA:
-   - No Chrome/Edge: Clique no botão "Instalar App" no cabeçalho
-   - No iOS: Use o Safari e adicione à tela inicial
-   - No Android: Use o Chrome e adicione à tela inicial
+2. Instale o Node.js
+3. Abra a aplicação no terminal 
+4. Execute npm install para instalar as dependencias
+5. Execute node ./server.js para rodar o servidor
+6. Abra o browser em http://localhost:3000/controlador.html ou http://localhost:3000/colaborador.html
 
 ## Estrutura do Projeto
 

@@ -449,12 +449,12 @@ async function importExcel() {
             // Para cada linha da planilha, tente adicionar via API
             for (const row of processedData) {
                 const newRouteData = {
-                    submission_id: String(row['Submission ID'] || Date.now()), // Garante que seja string e um fallback
+                    submission_id: String(row['Submission ID'] || Date.now()),
                     ID: String(row.ID || ''), // O ID do DB é INTEGER, mas estamos passando como string para evitar conflito com 'id' interno
-                    colaborador: row.colaborador || '', // Assumindo que você tem essa coluna na planilha
+                    colaborador: row.colaborador || '',
                     funcionario: row.funcionario || '',
                     endereco: row.endereco || '',
-                    numero: String(row.numero || ''), // Garante que seja string
+                    numero: String(row.numero || ''),
                     complemento: row.complemento || '',
                     bairro: row.bairro || '',
                     cidade: row.cidade || '',
