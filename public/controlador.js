@@ -108,16 +108,9 @@ async function atualizarRotaAPI(id, dadosAtualizados) {
  */
 async function deletarRotaAPI(id) {
     try {
-        const response = await fetch(`http://localhost:3000/api/rotas/${id}`, {
-            method: 'DELETE'
-        });
-
+        const response = await fetch(`http://localhost:3000/api/rotas/${id}`, {method: 'DELETE'});
         const result = await response.json();
-
-        if (!response.ok) {
-            throw new Error(result.error || 'Erro desconhecido ao deletar rota.');
-        }
-
+        if (!response.ok) throw new Error(result.error || 'Erro desconhecido ao deletar rota.');
         return result;
     } catch (error) {
         console.error(`Erro ao deletar rota com ID ${id} na API:`, error.message);
@@ -128,13 +121,10 @@ async function deletarRotaAPI(id) {
 /**
  * Limpa todas as rotas do banco de dados através da API.
  * @returns {Promise<object>} - O objeto de resposta da API.
- */
+*/
 async function limparTodasRotasAPI() {
     try {
-        const response = await fetch('http://localhost:3000/api/rotas/limpar-todas', {
-            method: 'DELETE'
-        });
-
+        const response = await fetch('http://localhost:3000/api/rotas/limpar-todas', {method: 'DELETE'});
         const result = await response.json();
 
         if (!response.ok) {
@@ -392,7 +382,7 @@ function filterRoutes() {
 async function importExcel() {
     const fileInput = document.getElementById('excelFile');
     const file = fileInput.files[0];
-
+    console.log("foi");
     if (!file) {
         showStatus('Por favor, selecione um arquivo Excel!', 'error');
         return;
@@ -429,7 +419,8 @@ async function importExcel() {
             }
 
             const headers = jsonData[0];
-            const requiredHeaders = ['Submission ID', 'ID', 'Funcionário', 'Endereço', 'Número'];
+            // Importante: Estes são os cabeçalhos OBRIGATÓRIOS na sua planilha Excel, com a exata capitalização e acentos.
+            const requiredHeaders = ['Submission ID', 'Funcionário', 'Endereço', 'Número']; // 'ID' removido daqui pois é AUTOINCREMENT no DB
             const missingHeaders = requiredHeaders.filter(header => !headers.includes(header));
 
             if (missingHeaders.length > 0) {
@@ -439,37 +430,36 @@ async function importExcel() {
 
             const processedData = jsonData.slice(1).map(row => {
                 const obj = {};
+                // Mapeia os dados da linha para um objeto usando os nomes dos cabeçalhos como chaves
                 headers.forEach((header, index) => {obj[header] = row[index] || '';});
                 return obj;
             });
 
             let importedCount = 0;
             let skippedCount = 0;
-
+            
             // Para cada linha da planilha, tente adicionar via API
             for (const row of processedData) {
                 const newRouteData = {
                     submission_id: String(row['Submission ID'] || Date.now()),
-                    ID: String(row.ID || ''), // O ID do DB é INTEGER, mas estamos passando como string para evitar conflito com 'id' interno
-                    colaborador: row.colaborador || '',
-                    funcionario: row.funcionario || '',
-                    endereco: row.endereco || '',
-                    numero: String(row.numero || ''),
-                    complemento: row.complemento || '',
-                    bairro: row.bairro || '',
-                    cidade: row.cidade || '',
-                    estado: row.estado || '',
-                    cep: row.cep || '',
-                    observacao: row.observacao || '',
+                    colaborador: row['Colaborador'] || row['Funcionário'] || '', // Prioriza 'Colaborador', senão usa 'Funcionário'
+                    funcionario: row['Funcionário'] || '',
+                    endereco: row['Endereço'] || '',
+                    numero: String(row['Número'] || ''), 
+                    complemento: row['Complemento'] || '',
+                    bairro: row['Bairro'] || '',
+                    cidade: row['Cidade'] || '',
+                    estado: row['Estado'] || '',
+                    cep: row['CEP'] || '',
+                    observacao: row['Observacao'] || '',
                     dataEntrega: row['Data de Entrega'] || '',
-                    prioridade: row.Prioridade || '',
+                    prioridade: row['Prioridade'] || '',
                     origem: 'excel' // Definir a origem como 'excel'
                 };
 
-                // Remove o campo ID se ele não for relevante para o INSERT (será AUTOINCREMENT)
-                // Se o seu server.js espera ID na requisição POST, mantenha. Se não, remova.
-                // Pelo seu server.js, a coluna é 'ID INTEGER PRIMARY KEY', então provavelmente não precisa enviar.
-                // Vou remover ID da nova rota para o POST, pois o DB vai gerar.
+                // Remove o campo ID se ele não for relevante para o INSERT (será AUTOINCREMENT no DB)
+                // Se a coluna 'ID' da sua planilha for uma referência externa que você queira armazenar,
+                // crie uma nova coluna no DB para isso, por exemplo 'excel_id_referencia'.
                 const { ID, ...rotaParaAPI } = newRouteData;
 
                 try {
@@ -691,7 +681,7 @@ function updateCounters() {
     document.getElementById('pendingRoutes').textContent = currentRoutes.filter(r => r.status === 'pendente').length;
 }
 
-
+console.log('--- controlador.js carregado ---');
 // Inicializa a tabela quando a página carrega
 document.addEventListener('DOMContentLoaded', async function() {
     // Remove a chamada a loadRoutes(), que usava localStorage
@@ -711,7 +701,13 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Adiciona eventos para os botões de ação (limpeza, importação, etc.)
     document.getElementById('clearAllRoutesButton').addEventListener('click', clearAllRoutes);
     document.getElementById('clearRoutesByEmployeeButton').addEventListener('click', clearRoutesByEmployee);
+
     document.getElementById('importExcelButton').addEventListener('click', importExcel);
+    /*document.getElementById('importForm').addEventListener('submit', async function(event) {
+        event.preventDefault(); // Impede o recarregamento da página pelo formulário
+        await importExcel(); // Chama a função de importação
+    });*/
+
     document.getElementById('exportExcelButton').addEventListener('click', exportToExcel);
     document.getElementById('printRoutesButton').addEventListener('click', printRoutes);
     document.getElementById('generateWhatsAppReportButton').addEventListener('click', generateWhatsAppReport);
